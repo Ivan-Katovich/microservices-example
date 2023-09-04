@@ -75,11 +75,15 @@ class SpeakersService {
   }
 
   async callService(requestOptions) {
+    const dir = `${__dirname}/../../_imagecache`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
     const servicePath = url.parse(requestOptions.url).path;
     const cacheKey = crypto.createHash('md5').update(requestOptions.method + servicePath).digest('hex');
     let cacheFile = null;
     if (requestOptions.responseType && requestOptions.responseType === 'stream') {
-      cacheFile = `${__dirname}/../../_imagecache/${cacheKey}`;
+      cacheFile = `${dir}/${cacheKey}`;
     }
     const result = await circuitBreaker.callService(requestOptions);
     if (!result) {
