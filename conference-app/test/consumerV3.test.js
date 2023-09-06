@@ -16,6 +16,11 @@ const {
     like,
 } = MatchersV3;
 
+const getService = async (servicename) => {
+    const response = await axios.get(`http://127.0.0.1:3000/find/${servicename}/1.0.0`);
+    return response.data;
+}
+
 const getListShort = (endpoint) => {
     const url = endpoint.url;
     const port = endpoint.port;
@@ -35,24 +40,6 @@ const getListShort = (endpoint) => {
     });
 };
 
-const getNames = (endpoint) => {
-    const url = endpoint.url;
-    const port = endpoint.port;
-
-    return axios.request({
-        method: 'GET',
-        baseURL: `${url}:${port}`,
-        url: '/names',
-        headers: {
-            Accept: [
-                'application/problem+json',
-                'application/json',
-                'text/plain',
-                '*/*',
-            ],
-        },
-    });
-};
 /*
 const EXPECTED_LIST_SHORT = [
     {
@@ -81,19 +68,25 @@ const EXPECTED_LIST_SHORT = eachLike(
     }
 );
 
-let url = 'http://127.0.0.1';
-const port = 58289;
+describe('GET /list-short', function() {
 
-describe.only('GET /list-short', function() {
+    let provider;
+    let service;
+    let url;
+    let port;
 
-    const provider = new PactV3({
-        port: port,
-        dir: path.resolve(process.cwd(), 'pacts'),
-        consumer: 'app-consumer-V3',
-        provider: 'app-provider-V3',
-        logLevel: LOG_LEVEL,
+    before(async () => {
+        service = await getService('speakers-service');
+        url = `http://${service.ip}`;
+        port = service.port
+        provider = new PactV3({
+            port: port,
+            dir: path.resolve(process.cwd(), 'pacts'),
+            consumer: 'app-consumer-V3',
+            provider: 'app-provider-V3',
+            logLevel: LOG_LEVEL,
+        });
     });
-
 
     it('returns an HTTP 200 and a list of speakers', async function() {
         provider

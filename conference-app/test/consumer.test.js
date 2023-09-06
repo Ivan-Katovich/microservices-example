@@ -6,6 +6,11 @@ const { Pact, Matchers, Publisher } = require('@pact-foundation/pact');
 const LOG_LEVEL = process.env.LOG_LEVEL || 'DEBUG';
 const axios = require('axios');
 
+const getService = async (servicename) => {
+    const response = await axios.get(`http://127.0.0.1:3000/find/${servicename}/1.0.0`);
+    return response.data;
+}
+
 const getListShort = (endpoint) => {
     const url = endpoint.url;
     const port = endpoint.port;
@@ -45,18 +50,10 @@ const getNames = (endpoint) => {
 };
 
 describe('The Dog API', () => {
-    let url = 'http://127.0.0.1';
-    const port = 58289;
-
-    const provider = new Pact({
-        port: port,
-        // log: path.resolve(process.cwd(), 'logs', 'mockserver-integration.log'),
-        dir: path.resolve(process.cwd(), 'pacts'),
-        spec: 2,
-        consumer: 'app-consumer',
-        provider: 'app-provider',
-        logLevel: LOG_LEVEL,
-    });
+    let url;
+    let port;
+    let service;
+    let provider;
 
     const EXPECTED_LIST_SHORT = [
         {
@@ -92,7 +89,20 @@ describe('The Dog API', () => {
     ];
 
     // Set up the provider
-    before(() => provider.setup());
+    before(async () => {
+        service = await getService('speakers-service');
+        url = `http://${service.ip}`;
+        port = parseInt(service.port);
+        provider = new Pact({
+            port: port,
+            dir: path.resolve(process.cwd(), 'pacts'),
+            spec: 2,
+            consumer: 'app-consumer',
+            provider: 'app-provider',
+            logLevel: LOG_LEVEL,
+        });
+        await provider.setup();
+    });
 
     // Write Pact when all tests done
     after(() => provider.finalize());
