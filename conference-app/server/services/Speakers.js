@@ -104,6 +104,8 @@ class SpeakersService {
   }
 
   async getService(servicename) {
+    console.log(this.serviceRegistryUrl);
+    console.log(this.serviceVersionIdentifier);
     const response = await axios.get(`${this.serviceRegistryUrl}/find/${servicename}/${this.serviceVersionIdentifier}`);
     return response.data;
   }

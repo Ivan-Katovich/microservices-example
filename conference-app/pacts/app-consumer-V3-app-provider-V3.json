@@ -1,0 +1,87 @@
+{
+  "consumer": {
+    "name": "app-consumer-V3"
+  },
+  "interactions": [
+    {
+      "description": "a request for all speakers",
+      "providerStates": [
+        {
+          "name": "I have a list of speakers"
+        }
+      ],
+      "request": {
+        "headers": {
+          "Accept": "application/problem+json, application/json, text/plain, */*"
+        },
+        "method": "GET",
+        "path": "/list-short"
+      },
+      "response": {
+        "body": [
+          {
+            "name": "Lorenzo Garcia",
+            "shortname": "Lorenzo_Garcia",
+            "title": "Art in Full Bloom"
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].shortname": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].title": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "12.1.0"
+    },
+    "pactRust": {
+      "ffi": "0.4.7",
+      "models": "1.1.9"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "app-provider-V3"
+  }
+}
